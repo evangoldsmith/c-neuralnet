@@ -3,16 +3,16 @@
 #include <string.h>
 #include "net/nn.h"
 
-#define INPUTS 2 // amount of inputs
-#define SIZE 3 // amount of layers after inputs (including output)
+#define NN_INPUTS 2 // amount of inputs
+#define NN_SIZE 3 // amount of layers after inputs (including output)
 #define LEARN_RATE 0.1 // rate at which params adjust after back prop
 
 int main() {
-    int num_inputs = 2;
-    int layers[SIZE] = {2, 2, 1};
+    int layers[NN_SIZE] = {2, 2, 1};
 
-    MLP* mlp = create_mlp(INPUTS, layers, SIZE, LEARN_RATE);
-    printf("mlp info\n-------\ninputs: %d\nlrate: %f\nsize: %d\n", mlp->input, mlp->lrate, SIZE);
-
+    MLP * mlp = create_mlp(NN_INPUTS, layers, NN_SIZE, LEARN_RATE);
+    mlp_info(mlp);
+    layer_info(mlp->layers[2]);
+    
     return 0;
 }

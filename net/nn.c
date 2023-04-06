@@ -3,9 +3,9 @@
 #include <string.h>
 #include "nn.h"
 
-void initialize() {
-    
-}
+#define INIT_BIAS 1.0
+
+double random_double() { return (double)rand() / RAND_MAX * 2 - 1; }
 
 void train() {
     /*
@@ -22,40 +22,60 @@ void train() {
     */
 }
 
-MLP * create_mlp(int inputs, int * arr, int size, double learning_rate) {
+MLP * create_mlp(int input, int * arr, int size, double learning_rate) {
     MLP* mlp = (MLP*) malloc(sizeof(MLP));
-    mlp->input = inputs;
+    mlp->inputs = input;
+    mlp->size = size;
     mlp->lrate = learning_rate;
-    mlp->layers = create_layers(size, *arr);
-    
+    int p_neurons = input;
+
+    mlp->layers = (Layer*) malloc(sizeof(Layer) * size);
+    for (int i = 0; i < size; i++) {
+        if (i > 0) {
+            p_neurons = mlp->layers[i-1].size;
+        }
+        mlp->layers[i].size = arr[i];
+        mlp->layers[i].neurons = create_neurons(arr[i], p_neurons);
+    }
     return mlp;
 }
 
-Layer * create_layers(int size, int *arr) {
-    Layer * layers = (Layer*) malloc(sizeof(Layer) * size);
-    
+// Creates dynamic array of neurons to be stored in layers of MLP
+Neuron * create_neurons(int size, int inputs) {
+    Neuron * neurons = (Neuron*) malloc(sizeof(Neuron) * size);
     for (int i = 0; i < size; i++) {
-        layers[i] = create_column();
+        neurons[i].bias = INIT_BIAS;
+        neurons[i].size = inputs;
+        neurons[i].weights = create_weights(inputs);
     }
-    return layers;
+
+    return neurons;
 }
 
-Layer
+// Creates and instantiates dynamic array of weights (doubles) to store in a neuron
+double * create_weights(int inputs) {
+    double * weights = (double*) malloc(sizeof(double) * inputs);
+    for (int i = 0; i < inputs; i++) {
+        weights[i] = random_double();
+    }
 
-Matrix* matrix_create(int row, int col) {
-	Matrix *matrix = malloc(sizeof(Matrix));
-	matrix->rows = row;
-	matrix->cols = col;
-	matrix->entries = malloc(row * sizeof(double*));
-	for (int i = 0; i < row; i++) {
-		matrix->entries[i] = malloc(col * sizeof(double));
-	}
-	return matrix;
+    return weights;
 }
 
-Neuron create_neuron(int size, double b) {
-    Neuron neuron;
-    double* weights = (double*) malloc(sizeof(double) * size); 
-    neuron.bias = b;
-    return neuron;
+void mlp_info(MLP* mlp) {
+    printf("mlp info\n-------\n");
+    printf("inputs: %d\nlrate: %f\nsize: %d\n", mlp->inputs, mlp->lrate, mlp->size);
+}
+
+void layer_info(Layer layer) {
+    printf("layer info\n-------\n");
+    printf("size: %d\n", layer.size);
+    for (int i = 0; i < layer.size; i++) {
+        printf("- neuron %d\n", i);
+        printf("\tinputs: %d\n", layer.neurons[i].size);
+        printf("\tbias: %f\n", layer.neurons[i].bias);
+        for (int j = 0; j < layer.neurons[i].size; j++) {
+            printf("\t\tweight %d : %f\n", j, layer.neurons[i].weights[j]);
+        }
+    }
 }

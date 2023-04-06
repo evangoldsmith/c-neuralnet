@@ -7,18 +7,21 @@ typedef struct {
 
 typedef struct {
 	int size;
-	Neuron * nuerons;
+	Neuron * neurons;
 } Layer;
 
 typedef struct {
-	int input;
+	int size;
+	int inputs;
 	Layer * layers;	
 	double lrate;
 } MLP; 
 
-void initialize();
 void train();
+void mlp_info(MLP* mlp);
+void layer_info(Layer layer);
+double random_double();
 
-MLP * create_mlp(int inputs, int * arr, int size, double learning_rate);
-Layer * create_layers(int size, int *arr);
-Neuron create_neuron(int size, double b);
+MLP * create_mlp(int inputs, int* arr, int size, double learning_rate);
+Neuron * create_neurons(int size, int inputs);
+double * create_weights(int inputs);
