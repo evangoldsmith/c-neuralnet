@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include "nn.h"
 
 #define INIT_BIAS 1.0
@@ -20,6 +21,27 @@ void train() {
     print loss
     
     */
+}
+
+void forward() {
+
+}
+
+// Function to calculate the output of a neuron
+double activation(double input[], Neuron n, int weights) {
+    // for each wi adn xi in neuron -> tanh(sum(wi*xi + b))
+    double out = 0.0;
+    int input_size = sizeof(input) / sizeof(input[0]);
+    int size = (weights > input_size) ? input_size : weights;
+
+
+````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````                                                                                                                                                                
+    for (int i = 0; i < size; i++) {
+        printf("input: %f, weight: %f, bias: %f\n", input[i], n.weights[i]);
+        out += input[i] * n.weights[i] + n.bias;
+    }
+
+    return tanh(out);
 }
 
 MLP * create_mlp(int input, int * arr, int size, double learning_rate) {
@@ -52,7 +74,7 @@ Neuron * create_neurons(int size, int inputs) {
     return neurons;
 }
 
-// Creates and instantiates dynamic array of weights (doubles) to store in a neuron
+// Creates and instantiates dynamic array of weights (doubles {-1 -> +1}) to store in a neuron
 double * create_weights(int inputs) {
     double * weights = (double*) malloc(sizeof(double) * inputs);
     for (int i = 0; i < inputs; i++) {
