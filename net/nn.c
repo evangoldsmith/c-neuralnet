@@ -4,8 +4,6 @@
 #include <math.h>
 #include "nn.h"
 
-#define INIT_BIAS 1.0
-
 double random_double() { return (double)rand() / RAND_MAX * 2 - 1; }
 
 void train() {
@@ -23,27 +21,42 @@ void train() {
     */
 }
 
-void forward() {
+// Forward pass throughout the MLP, calculating the output of each neuron through activation function
+void forward(MLP* mlp, double* inputs) {
+    for (int i = 0; i < mlp->size; i++) {
+        Layer l = mlp->layers[i];
+        
+        double* x;
+        // For first layer, use inputs
+        if (i == 0) {
+            x = inputs;
+        } 
+        // For all other layers, use previous layer's outputs
+        else {
+            x = mlp->layers[i-1].neurons;
+        }
+
+        for (int j = 0; j < l.size; j++) {
+            l.neurons[j].data = activation(x, l.neurons[j]);
+        }   
+   }
 
 }
 
 // Function to calculate the output of a neuron
-double activation(double input[], Neuron n, int weights) {
-    // for each wi adn xi in neuron -> tanh(sum(wi*xi + b))
+double activation(double* input, Neuron n) {
+    // for each wi and xi in neuron -> tanh(sum(wi*xi + b))
     double out = 0.0;
-    int input_size = sizeof(input) / sizeof(input[0]);
-    int size = (weights > input_size) ? input_size : weights;
 
-
-````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````````                                                                                                                                                                
-    for (int i = 0; i < size; i++) {
-        printf("input: %f, weight: %f, bias: %f\n", input[i], n.weights[i]);
+    for (int i = 0; i < n.size; i++) {
+        //printf("ACTIVATION -- input: %f, weight: %f, bias: %f\n", input[i], n.weights[i]);
         out += input[i] * n.weights[i] + n.bias;
     }
 
     return tanh(out);
 }
 
+// Instantiates and returns a new MLP
 MLP * create_mlp(int input, int * arr, int size, double learning_rate) {
     MLP* mlp = (MLP*) malloc(sizeof(MLP));
     mlp->inputs = input;
@@ -66,9 +79,10 @@ MLP * create_mlp(int input, int * arr, int size, double learning_rate) {
 Neuron * create_neurons(int size, int inputs) {
     Neuron * neurons = (Neuron*) malloc(sizeof(Neuron) * size);
     for (int i = 0; i < size; i++) {
-        neurons[i].bias = INIT_BIAS;
+        neurons[i].bias = random_double();
         neurons[i].size = inputs;
         neurons[i].weights = create_weights(inputs);
+        neurons[i].data = 0.0;
     }
 
     return neurons;
@@ -94,6 +108,7 @@ void layer_info(Layer layer) {
     printf("size: %d\n", layer.size);
     for (int i = 0; i < layer.size; i++) {
         printf("- neuron %d\n", i);
+        printf("\tdata: %f\n", layer.neurons[i].data);
         printf("\tinputs: %d\n", layer.neurons[i].size);
         printf("\tbias: %f\n", layer.neurons[i].bias);
         for (int j = 0; j < layer.neurons[i].size; j++) {
