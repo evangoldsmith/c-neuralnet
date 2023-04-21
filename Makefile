@@ -1,7 +1,6 @@
 C_SOURCES = $(wildcard net/*.c *.c)
 HEADERS = $(wildcard net/*.h *.h)
 OBJ = ${C_SOURCES:.c=.o}
-CFLAGS = 
 
 MAIN = main
 CC = /usr/bin/gcc
