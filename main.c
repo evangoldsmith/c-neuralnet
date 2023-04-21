@@ -14,7 +14,7 @@ int main() {
 
     MLP * mlp = create_mlp(NN_INPUTS, layers, NN_SIZE, LEARN_RATE);
     mlp_info(mlp);
-    layer_info(mlp->layers[0]);
+    layer_info(mlp->layers[NN_SIZE-1]);
 
     // DATA SET
     double inputs[4][NN_INPUTS] = {
@@ -23,11 +23,14 @@ int main() {
         {0.5, 1.0, 1.0},
         {1.0, 1.0, -1.0}, 
     };
-    double outputs[4] = { 1.0, -1.0, -1.0, 1.0 };
+    double exp_outputs[4] = { 1.0, -1.0, -1.0, 1.0 };
 
     // TRAINING
-    forward(mlp, &inputs);
-    layer_info(mlp->layers[2]);
+    double* output = forward(mlp, inputs[0], layers[NN_SIZE-1]);
+    layer_info(mlp->layers[NN_SIZE-1]);
+    printf("Output: %f\n", output[0]);
+    double loss = calc_loss(output, &exp_outputs[0], layers[NN_SIZE-1]);
+    printf("Loss: %f\n", loss);
 
     return 0;
 }

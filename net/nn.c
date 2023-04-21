@@ -21,8 +21,12 @@ void train() {
     */
 }
 
+// TODO: gonna have to take a 2d array of inputs 
 // Forward pass throughout the MLP, calculating the output of each neuron through activation function
-void forward(MLP* mlp, double* inputs) {
+double* forward(MLP* mlp, double* inputs, int output_size) {
+
+    double* output = (double*) malloc(sizeof(int) * output_size);
+
     for (int i = 0; i < mlp->size; i++) {
         Layer l = mlp->layers[i];
         
@@ -33,19 +37,34 @@ void forward(MLP* mlp, double* inputs) {
         } 
         // For all other layers, use previous layer's outputs
         else {
-            x = mlp->layers[i-1].neurons;
+            x = dbl_from_N(mlp->layers[i-1].neurons, mlp->layers[i-1].size);
         }
 
         for (int j = 0; j < l.size; j++) {
             l.neurons[j].data = activation(x, l.neurons[j]);
         }   
-   }
+    }
 
+    // Return the output of the last layer
+    for (int i = 0; i < output_size; i++) {
+        output[i] = mlp->layers[mlp->size-1].neurons[i].data;
+    }
+
+    return output;
+}
+
+// TODO: gonna need to take a 2d array of targets
+double calc_loss(double* output, double* target, int size) {
+    double sum = 0.0;
+    for (int i = 0; i < size; i++) {
+        sum += pow(output[i] - target[i], 2);
+    }
+    return sum;
 }
 
 // Function to calculate the output of a neuron
+// for each wi and xi in neuron -> tanh(sum(wi*xi + b))
 double activation(double* input, Neuron n) {
-    // for each wi and xi in neuron -> tanh(sum(wi*xi + b))
     double out = 0.0;
 
     for (int i = 0; i < n.size; i++) {
@@ -89,13 +108,22 @@ Neuron * create_neurons(int size, int inputs) {
 }
 
 // Creates and instantiates dynamic array of weights (doubles {-1 -> +1}) to store in a neuron
-double * create_weights(int inputs) {
+double* create_weights(int inputs) {
     double * weights = (double*) malloc(sizeof(double) * inputs);
     for (int i = 0; i < inputs; i++) {
         weights[i] = random_double();
     }
 
     return weights;
+}
+
+// Converts dynamic array of Neurons to doubles
+double* dbl_from_N(Neuron* neurons, int size) {
+    double* output = (double*) malloc(sizeof(double) * size);
+    for (int i = 0; i < size; i++) {
+        output[i] = neurons[i].data;
+    }
+    return output;
 }
 
 void mlp_info(MLP* mlp) {
