@@ -32,6 +32,8 @@ int main() {
     double loss = calc_loss(output, &exp_outputs[0], layers[NN_SIZE-1]);
     printf("Loss: %f\n", loss);
 
+    free_mlp(mlp);
+
     return 0;
 }
 

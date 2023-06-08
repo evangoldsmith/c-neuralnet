@@ -126,6 +126,21 @@ double* dbl_from_N(Neuron* neurons, int size) {
     return output;
 }
 
+void free_mlp(MLP* mlp) {
+    for (int i = 0; i < mlp->size; i++) {
+        free_layer(mlp->layers[i]);
+    }
+    free(mlp->layers);
+    free(mlp);
+}
+
+void free_layer(Layer layer) {
+    for (int i = 0; i < layer.size; i++) {
+        free(layer.neurons[i].weights);
+    }
+    free(layer.neurons);
+}
+
 void mlp_info(MLP* mlp) {
     printf("mlp info\n-------\n");
     printf("inputs: %d\nlrate: %f\nsize: %d\n", mlp->inputs, mlp->lrate, mlp->size);
