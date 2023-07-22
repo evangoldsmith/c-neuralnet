@@ -41,7 +41,7 @@ double* forward(MLP* mlp, double* inputs, int output_size) {
         }
 
         for (int j = 0; j < l.size; j++) {
-            l.neurons[j].data = activation(x, l.neurons[j]);
+            l.neurons[j].data = activation(x, l.neurons[j], mlp->eqs);
         }   
     }
 
@@ -62,17 +62,48 @@ double calc_loss(double* output, double* target, int size) {
     return sum;
 }
 
-// Function to calculate the output of a neuron
-// for each wi and xi in neuron -> tanh(sum(wi*xi + b))
-double activation(double* input, Neuron n) {
-    double out = 0.0;
+void backward() {
+    /*
+    
+    calculate gradients
 
+    update params
+
+    */
+}
+
+void calc_gradients() {
+    /*
+    
+    calculate gradients
+
+    */
+}
+
+// Function to calculate the output of a neuron
+// for each wi and xi in neuron -> tanh(sum(wi*xi)+b)
+double activation(double* input, Neuron n, stack *eqs) {
+    double out = 0.0;
     for (int i = 0; i < n.size; i++) {
         //printf("ACTIVATION -- input: %f, weight: %f, bias: %f\n", input[i], n.weights[i]);
-        out += input[i] * n.weights[i] + n.bias;
+        out += input[i] * n.weights[i];
+        push(eqs, newEq(input[i], n.weights[i], '*'));
     }
+    push(eqs, newEq(out, n.bias, '+'));
+    push(eqs, newEq(out + n.bias, 0.0, 't'));
+    return tanh(out + n.bias);
+}
 
-    return tanh(out);
+double inverse_tanh(double x) {
+    return 1 - pow(x, 2);
+}
+
+void add_eq(MLP* mlp, eq* data) {
+    push(mlp->eqs, &data);
+}
+
+void print_eqs(MLP* mlp) {
+    printStack(mlp->eqs);
 }
 
 // Instantiates and returns a new MLP
@@ -82,6 +113,9 @@ MLP * create_mlp(int input, int * arr, int size, double learning_rate) {
     mlp->size = size;
     mlp->lrate = learning_rate;
     int p_neurons = input;
+
+    mlp->eqs = (stack*) malloc(sizeof(stack));
+    mlp->eqs->head = NULL;
 
     mlp->layers = (Layer*) malloc(sizeof(Layer) * size);
     for (int i = 0; i < size; i++) {
@@ -101,7 +135,8 @@ Neuron * create_neurons(int size, int inputs) {
         neurons[i].bias = random_double();
         neurons[i].size = inputs;
         neurons[i].weights = create_weights(inputs);
-        neurons[i].data = 0.0;
+        // neurons[i].grads = create_gradients(inputs);
+        neurons[i].data = 0.0;;
     }
 
     return neurons;
@@ -116,6 +151,16 @@ double* create_weights(int inputs) {
 
     return weights;
 }
+
+// Creates and instantiates dynamic array of gradients for each weight in a neuron, initialized to 0.00
+// double* create_weights(int inputs) {
+//     double * grads = (double*) malloc(sizeof(double) * inputs);
+//     for (int i = 0; i < inputs; i++) {
+//         grads[i] = 0.00;
+//     }
+
+//     return grads;
+// }
 
 // Converts dynamic array of Neurons to doubles
 double* dbl_from_N(Neuron* neurons, int size) {
@@ -141,6 +186,7 @@ void free_layer(Layer layer) {
     free(layer.neurons);
 }
 
+// Debug functions
 void mlp_info(MLP* mlp) {
     printf("mlp info\n-------\n");
     printf("inputs: %d\nlrate: %f\nsize: %d\n", mlp->inputs, mlp->lrate, mlp->size);
