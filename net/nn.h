@@ -2,22 +2,23 @@
 
 typedef struct {
 	int size;	// # of weights
-	double data;
-	double* grads; // gradients of each weight dOUTPUT/dWEIGHTi
+	double data; // output of neuron
+	double* w_grads; // gradients of each weight dOUTPUT/dWEIGHTi
 	double* weights; // array of inputs coming into neuron
 	double bias; // trigger happiness of the neuron
+	double b_grad; // gradient of bias
 } Neuron;
 
 typedef struct {
-	int size;
+	int size; // # of neurons
 	Neuron* neurons;
 } Layer;
 
 typedef struct {
-	int size;
+	int size; // # of layers
 	int inputs;
 	Layer* layers;	
-	double lrate;
+	double lrate; // learning rate
 	stack* eqs; // stack of equations for back prop
 } MLP; 
 

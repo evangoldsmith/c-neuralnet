@@ -133,10 +133,11 @@ Neuron * create_neurons(int size, int inputs) {
     Neuron * neurons = (Neuron*) malloc(sizeof(Neuron) * size);
     for (int i = 0; i < size; i++) {
         neurons[i].bias = random_double();
+        neurons[i].b_grad = 0.0;
         neurons[i].size = inputs;
         neurons[i].weights = create_weights(inputs);
-        // neurons[i].grads = create_gradients(inputs);
-        neurons[i].data = 0.0;;
+        neurons[i].w_grads = create_grads(inputs);
+        neurons[i].data = 0.0;
     }
 
     return neurons;
@@ -153,14 +154,14 @@ double* create_weights(int inputs) {
 }
 
 // Creates and instantiates dynamic array of gradients for each weight in a neuron, initialized to 0.00
-// double* create_weights(int inputs) {
-//     double * grads = (double*) malloc(sizeof(double) * inputs);
-//     for (int i = 0; i < inputs; i++) {
-//         grads[i] = 0.00;
-//     }
+double* create_grads(int inputs) {
+    double * grads = (double*) malloc(sizeof(double) * inputs);
+    for (int i = 0; i < inputs; i++) {
+        grads[i] = 0.00;
+    }
 
-//     return grads;
-// }
+    return grads;
+}
 
 // Converts dynamic array of Neurons to doubles
 double* dbl_from_N(Neuron* neurons, int size) {
@@ -199,9 +200,9 @@ void layer_info(Layer layer) {
         printf("- neuron %d\n", i);
         printf("\tdata: %f\n", layer.neurons[i].data);
         printf("\tinputs: %d\n", layer.neurons[i].size);
-        printf("\tbias: %f\n", layer.neurons[i].bias);
+        printf("\tbias: %f,\t b_grad: %f\n\n", layer.neurons[i].bias, layer.neurons[i].b_grad);
         for (int j = 0; j < layer.neurons[i].size; j++) {
-            printf("\t\tweight %d : %f\n", j, layer.neurons[i].weights[j]);
+            printf("\t\tweight %d : %f,\t grad : %f\n", j, layer.neurons[i].weights[j], layer.neurons[i].w_grads[j]);
         }
     }
 }
