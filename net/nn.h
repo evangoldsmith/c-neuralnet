@@ -25,6 +25,7 @@ typedef struct {
 // Training 
 void train();
 double* forward(MLP* mlp, double* inputs, int output_size);
+void backward(MLP* mlp);
 double activation(double input[], Neuron n, stack* eqs);
 double calc_loss(double* output, double* target, int size);
  

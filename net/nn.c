@@ -62,14 +62,44 @@ double calc_loss(double* output, double* target, int size) {
     return sum;
 }
 
-void backward() {
-    /*
-    
-    calculate gradients
-
-    update params
-
-    */
+void backward(MLP* mlp) {
+    stack *eqs = mlp->eqs;
+    int layer = mlp->size - 1;
+    int i = 0;
+    while (eqs->head != NULL) {
+        eq* e = pop(eqs);
+        printf("eq %d: %f %c %f\n", i, e->data1, e->op, e->data2);
+        switch (e->op)
+        { 
+            case '+':
+                if (i == 0) {
+                    mlp->layers[layer].neurons[i].b_grad = 1.0;
+                } else {
+                    mlp->layers[layer].neurons[i].b_grad = mlp->layers[layer].neurons[i-1].b_grad;
+                }
+                break;
+            case '*':
+                if (i == 0) {
+                    mlp->layers[layer].neurons[i].b_grad = e->data2;
+                } else {
+                    mlp->layers[layer].neurons[i].b_grad = mlp->layers[layer].neurons[i-1].b_grad * e->data2;
+                }
+                break;
+            case 't':
+                if (i == 0) {
+                    mlp->layers[layer].neurons[i].b_grad = 1;
+                } else {
+                    mlp->layers[layer].neurons[i].b_grad = mlp->layers[layer].neurons[i-1].b_grad * inverse_tanh(e->data1);
+                }
+            
+                break;
+            default:
+                printf("ERROR: invalid operation\n");
+                break;
+        }
+        i++;
+        layer--;
+    }
 }
 
 void calc_gradients() {
@@ -172,6 +202,7 @@ double* dbl_from_N(Neuron* neurons, int size) {
     return output;
 }
 
+// Memory management
 void free_mlp(MLP* mlp) {
     for (int i = 0; i < mlp->size; i++) {
         free_layer(mlp->layers[i]);
@@ -183,6 +214,7 @@ void free_mlp(MLP* mlp) {
 void free_layer(Layer layer) {
     for (int i = 0; i < layer.size; i++) {
         free(layer.neurons[i].weights);
+        free(layer.neurons[i].w_grads);
     }
     free(layer.neurons);
 }
