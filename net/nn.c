@@ -6,21 +6,6 @@
 
 double random_double() { return (double)rand() / RAND_MAX * 2 - 1; }
 
-void train() {
-    /*
-    
-    forward pass
-    calculate loss
-
-    backward pass
-
-    update params
-
-    print loss
-    
-    */
-}
-
 // TODO: gonna have to take a 2d array of inputs 
 // Forward pass throughout the MLP, calculating the output of each neuron through activation function
 double* forward(MLP* mlp, double* inputs, int output_size) {
@@ -100,14 +85,6 @@ void backward(MLP* mlp) {
         i++;
         layer--;
     }
-}
-
-void calc_gradients() {
-    /*
-    
-    calculate gradients
-
-    */
 }
 
 // Function to calculate the output of a neuron
